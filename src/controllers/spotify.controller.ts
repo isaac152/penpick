@@ -5,9 +5,12 @@ import { logger } from '../logger';
 
 const getRecommendedTracks = async (client: IStreamingClient, bands: string[]): Promise<string[]> => {
     try {
+        await client.validateConnection();
+
         const artistsId = await Promise.all(bands.map(band => client.getArtistID(band)));
         const topTracks = await Promise.all(artistsId.map(async artistId => await client.getTopTracks(artistId)));
-        return topTracks.reduce((acc, tracks) => acc.concat(tracks), []);
+        const limitedTopTracks = topTracks.map(tracks => tracks.slice(0, 5));
+        return limitedTopTracks.reduce((acc, tracks) => acc.concat(tracks), []);
     } catch (error) {
         logger.error({ bands, error }, 'Failed to get recommended tracks from Spotify');
         throw new SpotifyApiError();

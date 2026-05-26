@@ -3,6 +3,10 @@ import { Playlist, PlaylistMetaData } from "../../src/types/spotify-types";
 
 export class MockSpotifyClient implements IStreamingClient {
 
+    async validateConnection(): Promise<void> {
+        return;
+    }
+
 
     async getArtistID(artist: string): Promise<string> {
         return '6olE6TJLqED3rqDCT0FyPh'

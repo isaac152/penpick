@@ -36,6 +36,10 @@ export class SpotifyClient implements IStreamingClient {
         if (new Date() >= this.tokenTime) await this.refreshToken();
     }
 
+    async validateConnection(): Promise<void> {
+        await this.checkTokenTime();
+    }
+
     private generateHeaders(): Headers {
         return { Authorization: `Bearer ${this.accessToken}`, 'Content-Type': 'application/x-www-form-urlencoded' };
     }
