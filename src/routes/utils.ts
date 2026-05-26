@@ -10,9 +10,8 @@ const capitalizeText = (word: string): string => {
 };
 
 const generatePlaylistKey = (details: PlaylistDetails): string => {
-    const topRelated = details.topArtist ? 'TOP10' : '-';
-    const shuffled = details.shuffle ? 'Shuffled' : '-';
-    return `${details.baseBand}${topRelated}${shuffled}`;
+    const shuffled = details.shuffle ? 'Shuffled' : '';
+    return `${details.baseBand} TOP10 ${shuffled}`;
 };
 
 export { shuffleArray, capitalizeText, generatePlaylistKey };

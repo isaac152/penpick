@@ -21,8 +21,7 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
 
     const playlistDetail: PlaylistDetails = {
         baseBand: capitalizeText(band),
-        shuffle: request.body.shuffle ? true : false,
-        topArtist: request.body.top ? true : false
+        shuffle: request.body.shuffle ? true : false
     };
 
     const playlistKey = generatePlaylistKey(playlistDetail);
@@ -34,7 +33,7 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
         const spotifyClient = new SpotifyClient();
 
         let recomendations: string[] = await getBandsRecomendations(band);
-        recomendations = playlistDetail.topArtist ? recomendations.slice(0, 10) : recomendations;
+        recomendations = recomendations.slice(0, 10);
 
         let tracks = await getRecommendedTracks(spotifyClient, recomendations);
         tracks = playlistDetail.shuffle ? shuffleArray(tracks) : tracks;

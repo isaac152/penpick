@@ -19,5 +19,4 @@ export type Playlist = {
 export type PlaylistDetails = {
     baseBand: string;
     shuffle: boolean;
-    topArtist: boolean;
 };
