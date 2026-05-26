@@ -4,6 +4,7 @@ import express from 'express';
 import { getRecommendedTracks, getPlaylistUrl } from '../controllers/spotify.controller';
 import { getBandsRecomendations } from '../controllers/scraping.controller';
 import { SpotifyClient } from '../services/spotify/client';
+import { SpotifyApiError } from '../services/spotify/exceptions';
 import { PlaylistDetails } from '../types/spotify-types';
 import { capitalizeText, generatePlaylistKey, shuffleArray } from './utils';
 import { CacheStorageClient } from '../services/storage/client';
@@ -27,7 +28,7 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
     const playlistKey = generatePlaylistKey(playlistDetail);
 
     const cachedPlaylist = storage.getValue(playlistKey);
-    if (cachedPlaylist) return await response.json({ spotifyUrl: cachedPlaylist });
+    if (cachedPlaylist) return response.json({ spotifyUrl: cachedPlaylist });
 
     try {
         const spotifyClient = new SpotifyClient();
@@ -42,9 +43,13 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
 
         storage.setValue(playlistKey, spotifyUrl);
 
-        return await response.json({ spotifyUrl });
+        return response.json({ spotifyUrl });
     } catch (error: any) {
-        response.send({ error: error.message });
+        if (error instanceof SpotifyApiError) {
+            return response.status(502).json({ error: error.message });
+        }
+
+        return response.status(400).json({ error: error.message });
     }
 });
 

@@ -81,6 +81,10 @@
                         <div class="mx-auto break-words  text-center">
                             <a class="text-center text-complement font-semibold" href="${data.spotifyUrl}">${data.spotifyUrl}</a>
                         </div>`;
+                },
+                error: function (xhr) {
+					const errorMessage = xhr.responseJSON?.error || 'Unexpected error, please try again later';
+					modal.innerHTML = `<p class="font-roboto text-center font-bold text-3xl text-red-500">${errorMessage}</p>`
                 }
             });
             e.preventDefault(); 
