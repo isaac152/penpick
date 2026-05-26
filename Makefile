@@ -15,3 +15,9 @@ dev: build-dev
 
 test:
 	docker run --rm -v $(shell pwd):/app ${APP_NAME} sh -c 'npm run test'
+
+deploy:
+	docker run -d --restart always -p 8889:5009 --name ${APP_NAME}  ${APP_NAME}
+
+down:
+	docker kill ${APP_NAME} && docker rm ${APP_NAME}
