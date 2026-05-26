@@ -5,6 +5,7 @@ import { getRecommendedTracks, getPlaylistUrl } from '../controllers/spotify.con
 import { getBandsRecomendations } from '../controllers/scraping.controller';
 import { SpotifyClient } from '../services/spotify/client';
 import { SpotifyApiError } from '../services/spotify/exceptions';
+import { RecentPlaylist } from '../services/storage/interfaces';
 import { PlaylistDetails } from '../types/spotify-types';
 import { capitalizeText, generatePlaylistKey, shuffleArray } from './utils';
 import { CacheStorageClient } from '../services/storage/client';
@@ -12,8 +13,22 @@ import { CacheStorageClient } from '../services/storage/client';
 const bandRouter: Router = express.Router();
 const storage = new CacheStorageClient();
 
-bandRouter.get('/', (request: Request, response: Response) => {
-    response.render('index.handlebars');
+bandRouter.get('/', async (request: Request, response: Response) => {
+    let recentPlaylists = storage.getRecentPlaylists();
+
+    if (recentPlaylists.length === 0) {
+        try {
+            const spotifyClient = new SpotifyClient();
+            recentPlaylists = await spotifyClient.getRecentPlaylists();
+            if (recentPlaylists.length > 0) {
+                storage.setRecentPlaylists(recentPlaylists);
+            }
+        } catch (error) {
+            recentPlaylists = [];
+        }
+    }
+
+    response.render('index.handlebars', { recentPlaylists, hasRecentPlaylists: recentPlaylists.length > 0 });
 });
 
 bandRouter.post('/form', async (request: Request, response: Response) => {
@@ -25,9 +40,13 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
     };
 
     const playlistKey = generatePlaylistKey(playlistDetail);
+    const recentPlaylist: RecentPlaylist = { name: playlistKey, url: '' };
 
     const cachedPlaylist = storage.getValue(playlistKey);
-    if (cachedPlaylist) return response.json({ spotifyUrl: cachedPlaylist });
+    if (cachedPlaylist) {
+        recentPlaylist.url = cachedPlaylist;
+        return response.json({ spotifyUrl: cachedPlaylist, recentPlaylists: storage.addRecentPlaylist(recentPlaylist) });
+    }
 
     try {
         const spotifyClient = new SpotifyClient();
@@ -41,8 +60,10 @@ bandRouter.post('/form', async (request: Request, response: Response) => {
         const spotifyUrl = await getPlaylistUrl(spotifyClient, tracks, playlistKey);
 
         storage.setValue(playlistKey, spotifyUrl);
+        recentPlaylist.url = spotifyUrl;
+        const updatedRecentPlaylists = storage.addRecentPlaylist(recentPlaylist);
 
-        return response.json({ spotifyUrl });
+        return response.json({ spotifyUrl, recentPlaylists: updatedRecentPlaylists });
     } catch (error: any) {
         if (error instanceof SpotifyApiError) {
             return response.status(502).json({ error: error.message });

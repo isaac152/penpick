@@ -1,89 +1,166 @@
-<div class="flex flex-col h-screen" id="body">
-	<div  class="bg-[url('../images/background.png')] bg-dark bg-no-repeat bg-cover w-screen h-full" >
-		<div class="flex justify-center w-3/5 mx-auto">
-			<div>
+<div class="min-h-screen bg-dark text-white">
+    <div class="mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+        <main class="flex-1">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <section class="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900">
+                    <div class="bg-[url('../images/background.png')] bg-cover bg-center">
+                        <div class="bg-black/70 px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+                            <img class="mx-auto mb-6 w-56 sm:w-72" src="/images/logo.png" alt="Penpick logo">
 
-				<img class="mx-auto" src="./images/logo.png">
-				<div class="w-3/4 md:w-1/2 my-7 mx-auto">
-					<p class="text-center text-white font-roboto md-text-3xl text-xl font-medium break-words">Write the name of an artist or band and we will generate a playlist based on your taste using AI</p>
-				</div>
-				<form method='post' action='/form' id='form' class="space-y-5 flex flex-col justify-center mx-auto" >
-					<input class="rounded-md p-2 md:w-3/5 mx-auto" placeholder='Artis/band' type='text' name='band' required />
-					<div class='text-white text-center text-normal text-xl flex justify-center space-x-11'>
-						<div>
-							<input type='checkbox' name='shuffle' id='shuffle' />
-							<label for='shuffle'>Shuflle the playlist? </label>
-						</div>
-					</div>
-					<button class="text-4xl md:w-1/2 mx-auto p-2 font-semibold font-robot rounded-2xl bg-complement text-white" type='submit'> Generate </button>
-				</form>
-			</div>
-		</div>
+                            <div class="mx-auto max-w-2xl text-center">
+                                <h1 class="text-4xl font-bold leading-tight sm:text-5xl">Turn one artist into your next playlist.</h1>
+                                <p class="mt-4 text-base leading-7 text-zinc-300 sm:text-lg">Type an artist or band and Penpick will build a fresh Spotify playlist from the closest related sounds.</p>
+                            </div>
 
-	</div>
-	<div class="bg-dark w-full mx-auto flex justify-center">
-	<div class="flex justify-around">
-		<a href="https://github.com/isaac152" class="w-1/5"><img src="https://img.icons8.com/ios-filled/150/FF6347/github.png"/></a> 
-		<a href="https://www.linkedin.com/in/isaac152" class="w-1/5"><img src="https://img.icons8.com/ios-filled/150/FF6347/linkedin.png" /></a>     
-		<a href="https://twitter.com/isaac152" class="w-1/5"><img src="https://img.icons8.com/ios-filled/150/FF6347/twitter.png" /></a>
-	</div>
-	</div>
+                            <form method="post" action="/form" id="form" class="mx-auto mt-10 max-w-2xl space-y-5">
+                                <div>
+                                    <label class="mb-3 block text-center text-sm font-medium text-zinc-200" for="band">Artist or band</label>
+                                    <input class="w-full rounded-2xl border border-white/10 bg-black/30 px-5 py-4 text-lg text-white outline-none placeholder:text-zinc-500 focus:border-complement focus:ring-4 focus:ring-complement/20" placeholder="Radiohead, Bjork, Tame Impala..." type="text" name="band" id="band" required>
+                                </div>
+
+                                <label class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+                                    <div class="flex-1 text-left">
+                                        <p class="text-base font-semibold text-white">Shuffle playlist</p>
+                                        <p class="mt-1 text-sm leading-6 text-zinc-400">Mix the final track order before sending it to Spotify.</p>
+                                    </div>
+                                    <input class="h-5 w-5 accent-complement" type="checkbox" name="shuffle" id="shuffle">
+                                </label>
+
+                                <button class="w-full rounded-2xl bg-complement px-6 py-4 text-lg font-bold text-white shadow-2xl transition hover:brightness-110" type="submit">
+                                    Generate Playlist
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="rounded-3xl border border-white/10 bg-zinc-900 p-6 sm:p-8 lg:p-10">
+                    <div class="mx-auto max-w-2xl text-center">
+                        <h2 class="text-3xl font-bold leading-tight sm:text-4xl">Last 5 generated playlists</h2>
+                        <p class="mt-4 text-sm leading-7 text-zinc-400 sm:text-base">The latest playlists created by Penpick appear here automatically.</p>
+                    </div>
+
+                    <div class="mt-8" id="recent-playlists">
+                        {{#if hasRecentPlaylists}}
+                            <div class="space-y-4">
+                                {{#each recentPlaylists}}
+                                    <a href="{{this.url}}" target="_blank" rel="noreferrer" class="block rounded-2xl border border-white/10 bg-black/20 p-5 transition hover:border-complement hover:bg-black/30">
+                                        <p class="text-xs font-bold uppercase tracking-[0.32em] text-complement">Playlist</p>
+                                        <p class="mt-3 break-words text-xl font-semibold text-white">{{this.name}}</p>
+                                        <p class="mt-3 break-words text-sm text-zinc-400">{{this.url}}</p>
+                                    </a>
+                                {{/each}}
+                            </div>
+                        {{else}}
+                            <div class="flex min-h-[28rem] items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
+                                <div>
+                                    <p class="text-2xl font-semibold text-white">No playlists yet.</p>
+                                    <p class="mt-3 text-sm leading-7 text-zinc-400 sm:text-base">Generate one from the left panel and it will appear here instantly.</p>
+                                </div>
+                            </div>
+                        {{/if}}
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer class="mt-6 rounded-3xl border border-white/10 bg-zinc-900 px-6 py-5">
+            <div class="flex items-center justify-center gap-6">
+                <a href="https://github.com/isaac152" class="transition hover:scale-105"><img class="h-10 w-10" src="https://img.icons8.com/ios-filled/150/FF6347/github.png" alt="GitHub"></a>
+                <a href="https://www.linkedin.com/in/isaac152" class="transition hover:scale-105"><img class="h-10 w-10" src="https://img.icons8.com/ios-filled/150/FF6347/linkedin.png" alt="LinkedIn"></a>
+                <a href="https://twitter.com/isaac152" class="transition hover:scale-105"><img class="h-10 w-10" src="https://img.icons8.com/ios-filled/150/FF6347/twitter.png" alt="Twitter"></a>
+            </div>
+        </footer>
+    </div>
 </div>
-<div class="fixed inset-0 p-4 bg-white w-2/5 m-auto border-complement rounded-2xl border-2 space-y-5 h-fit hidden" id="modal">
 
+<div class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4" id="modal">
+    <div class="w-full max-w-xl rounded-3xl border-2 border-complement bg-white p-8 text-center text-zinc-900 shadow-2xl" id="modal-content"></div>
 </div>
+
 <script>
-    const modal = document.getElementById("modal");
-    const body = document.getElementById("body");
-    const form = document.getElementById('form');
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+    const recentPlaylistsContainer = document.getElementById('recent-playlists');
 
     function openModal() {
-		modal.innerHTML = `
-		<img class="mx-auto w-1/3 " src="./images/spinner.gif">
-    	<p class="font-roboto text-center font-bold text-3xl"> Please wait...</p>
-		`
-        modal.classList.remove("hidden");
-        body.classList.add("brightness-50")
+        modalContent.innerHTML = `
+            <img class="mx-auto w-24" src="/images/spinner.gif" alt="Loading">
+            <p class="mt-4 text-3xl font-bold text-zinc-900">Please wait...</p>
+        `;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeModal() {
-        modal.classList.add("hidden");
-        body.classList.remove("brightness-50")
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 
-    body.addEventListener("click", closeModal);
+    function renderRecentPlaylists(playlists) {
+        if (!playlists || playlists.length === 0) {
+            recentPlaylistsContainer.innerHTML = `
+                <div class="flex min-h-[28rem] items-center justify-center rounded-3xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
+                    <div>
+                        <p class="text-2xl font-semibold text-white">No playlists yet.</p>
+                        <p class="mt-3 text-sm leading-7 text-zinc-400 sm:text-base">Generate one from the left panel and it will appear here instantly.</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
 
-	function renderSpotifyData(data){
-		modal.innerHTML = data;
-	}
+        recentPlaylistsContainer.innerHTML = `
+            <div class="space-y-4">
+                ${playlists
+                    .map(
+                        playlist => `
+                            <a href="${playlist.url}" target="_blank" rel="noreferrer" class="block rounded-2xl border border-white/10 bg-black/20 p-5 transition hover:border-complement hover:bg-black/30">
+                                <p class="text-xs font-bold uppercase tracking-[0.32em] text-complement">Playlist</p>
+                                <p class="mt-3 break-words text-xl font-semibold text-white">${playlist.name}</p>
+                                <p class="mt-3 break-words text-sm text-zinc-400">${playlist.url}</p>
+                            </a>
+                        `
+                    )
+                    .join('')}
+            </div>
+        `;
+    }
 
+    modal.addEventListener('click', event => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
 
-    $(document).ready(function() {
-        $('form').submit(function (e) {
-			openModal()
+    $(document).ready(function () {
+        $('#form').submit(function (e) {
+            e.preventDefault();
+            openModal();
+
             $.ajax({
-                type: "POST",
+                type: 'POST',
                 url: '/form',
-                data: $('#form').serialize(), 
+                data: $('#form').serialize(),
                 success: function (data) {
-					if (data.error){
-						modal.innerHTML = `<p class="font-roboto text-center font-bold text-3xl text-red-500">${data.error}</p>`
-						return 
-					}
-					modal.innerHTML =`
-                        <img class="mx-auto w-1/2 md:w-1/4" src="./images/small_logo.png">
-                        <p class="font-bold text-3xl text-center font-roboto">Enjoy your playlist!</p>
-                        <p class="font-bold text-3xl text-center font-roboto">Thanks for using PENPICK</p>
-                        <div class="mx-auto break-words  text-center">
-                            <a class="text-center text-complement font-semibold" href="${data.spotifyUrl}">${data.spotifyUrl}</a>
-                        </div>`;
+                    if (data.error) {
+                        modalContent.innerHTML = `<p class="text-3xl font-bold text-red-600">${data.error}</p>`;
+                        return;
+                    }
+
+                    renderRecentPlaylists(data.recentPlaylists);
+                    modalContent.innerHTML = `
+                        <img class="mx-auto w-24" src="/images/small_logo.png" alt="Penpick logo">
+                        <p class="mt-4 text-3xl font-bold text-zinc-900">Enjoy your playlist!</p>
+                        <p class="mt-3 text-lg text-zinc-700">Thanks for using PENPICK.</p>
+                        <p class="mt-4 break-words text-base font-semibold"><a class="text-complement" href="${data.spotifyUrl}" target="_blank" rel="noreferrer">${data.spotifyUrl}</a></p>
+                    `;
                 },
                 error: function (xhr) {
-					const errorMessage = xhr.responseJSON?.error || 'Unexpected error, please try again later';
-					modal.innerHTML = `<p class="font-roboto text-center font-bold text-3xl text-red-500">${errorMessage}</p>`
+                    const errorMessage = xhr.responseJSON?.error || 'Unexpected error, please try again later';
+                    modalContent.innerHTML = `<p class="text-3xl font-bold text-red-600">${errorMessage}</p>`;
                 }
             });
-            e.preventDefault(); 
         });
     });
 </script>

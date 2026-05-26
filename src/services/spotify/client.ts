@@ -2,11 +2,13 @@ import {
     REFRESH_TOKEN,
     SPOTIFY_CLIENT_ID,
     SPOTIFY_CLIENT_SECRET,
+    USER_ID,
     REFRESH_URL,
     SEARCH_URL,
     ARTIST_URL,
     CREATE_PLAYLIST_URL,
     PLAYLIST_URL,
+    USER_URL,
     regionTopTracks
 } from './constants';
 import { Response } from 'node-fetch';
@@ -14,6 +16,7 @@ import fetch from 'node-fetch';
 import { Playlist, PlaylistMetaData, SearchOptions } from '../../types/spotify-types';
 import { IStreamingClient } from '../interfaces';
 import { logger } from '../../logger';
+import { RecentPlaylist } from '../storage/interfaces';
 
 type Headers = {
     'Content-Type': string;
@@ -38,6 +41,20 @@ export class SpotifyClient implements IStreamingClient {
 
     async validateConnection(): Promise<void> {
         await this.checkTokenTime();
+    }
+
+    async getRecentPlaylists(): Promise<RecentPlaylist[]> {
+        await this.checkTokenTime();
+
+        const response: Response = await fetch(`${USER_URL}/${USER_ID}/playlists?limit=5`, {
+            headers: this.generateHeaders()
+        });
+        const playlistsData: any = await this.getResponseData(response, 'getRecentPlaylists');
+
+        return playlistsData.items.map((playlist: any) => ({
+            name: playlist.name,
+            url: playlist.external_urls.spotify
+        }));
     }
 
     private generateHeaders(): Headers {

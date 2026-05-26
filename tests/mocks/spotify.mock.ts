@@ -1,10 +1,15 @@
 import { IStreamingClient } from "../../src/services/interfaces";
+import { RecentPlaylist } from "../../src/services/storage/interfaces";
 import { Playlist, PlaylistMetaData } from "../../src/types/spotify-types";
 
 export class MockSpotifyClient implements IStreamingClient {
 
     async validateConnection(): Promise<void> {
         return;
+    }
+
+    async getRecentPlaylists(): Promise<RecentPlaylist[]> {
+        return [];
     }
 
 
