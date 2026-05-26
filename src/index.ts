@@ -6,6 +6,7 @@ import { Application } from 'express';
 import { engine } from 'express-handlebars';
 import { routerApi } from './routes';
 import { PORT } from './config/settings';
+import { logger } from './logger';
 
 const app: Application = express();
 
@@ -19,5 +20,5 @@ app.set('views', path.join(__dirname, '../templates/'));
 routerApi(app);
 
 app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}`);
+    logger.info({ port: PORT }, 'Application listening');
 });

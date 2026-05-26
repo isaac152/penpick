@@ -1,6 +1,7 @@
 import { getBands } from '../services/scraping';
 import { BandNotFoundError } from '../services/scraping/exceptions';
 import { Band } from '../types/band-types';
+import { logger } from '../logger';
 
 function getBandsDistance(origin: Band, final: Band): Band {
     const deltaX = final.coordenates[0] - origin.coordenates[0];
@@ -18,7 +19,7 @@ const getBandsRecomendations = async (inputBand: string): Promise<string[]> => {
 
         return distanceBands.map((band: Band) => band.name);
     } catch (error) {
-        console.log(error);
+        logger.error({ inputBand, error }, 'Failed to get band recommendations');
         throw new BandNotFoundError(inputBand);
     }
 };

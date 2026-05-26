@@ -1,11 +1,17 @@
 import { IStreamingClient } from '../services/interfaces';
 import { SpotifyApiError } from '../services/spotify/exceptions';
 import { Playlist, PlaylistMetaData } from '../types/spotify-types';
+import { logger } from '../logger';
 
 const getRecommendedTracks = async (client: IStreamingClient, bands: string[]): Promise<string[]> => {
-    const artistsId = await Promise.all(bands.map(band => client.getArtistID(band)));
-    const topTracks = await Promise.all(artistsId.map(async artistId => await client.getTopTracks(artistId)));
-    return topTracks.reduce((acc, tracks) => acc.concat(tracks), []);
+    try {
+        const artistsId = await Promise.all(bands.map(band => client.getArtistID(band)));
+        const topTracks = await Promise.all(artistsId.map(async artistId => await client.getTopTracks(artistId)));
+        return topTracks.reduce((acc, tracks) => acc.concat(tracks), []);
+    } catch (error) {
+        logger.error({ bands, error }, 'Failed to get recommended tracks from Spotify');
+        throw new SpotifyApiError();
+    }
 };
 
 const generatePlaylistMetaData = (playlistKey: string): PlaylistMetaData => {
@@ -26,9 +32,14 @@ const getPlaylistUrl = async (client: IStreamingClient, tracks: string[], playli
             await client.addTracksToPlaylist(playlist.id, trackBatch);
         }
 
-        return await playlist.link;
+        logger.info(
+            { tracksCount: tracks.length, spotifyUrl: playlist.link },
+            'Spotify playlist created successfully'
+        );
+
+        return playlist.link;
     } catch (error) {
-        console.log(error);
+        logger.error({ playlistKey, tracksCount: tracks.length, error }, 'Failed to create Spotify playlist');
         throw new SpotifyApiError();
     }
 };
